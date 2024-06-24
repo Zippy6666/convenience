@@ -1,1 +1,1 @@
-Reusable code made by me.
+Reusable GLua code for Gmod.
