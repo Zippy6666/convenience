@@ -1,7 +1,12 @@
-// 'ents' library extensions
+--[[
+==================================================================================================
+                    ENTITY STUFF
+==================================================================================================
+--]]
 
-    -- Spawn a NPC from the spawn menu
-function ents.CreateSpawnMenuNPC( SpawnMenuClass, pos, wep )
+
+-- Easy way to spawn a NPC from the spawn menu
+local function CreateSpawnMenuNPC( SpawnMenuClass, pos, wep )
 
 
     -- Find NPC in spawn menu
@@ -90,8 +95,8 @@ function ents.CreateSpawnMenuNPC( SpawnMenuClass, pos, wep )
 end
 
 
-    -- Spawns an entity for a short duration allowing you to obtain info about it
-function ents.GetInfo( cls, func )
+-- Spawns an entity for a short duration allowing you to obtain info about it
+local function EntityGetInfo( cls, func )
 
     local ent = ents.Create(cls)
     if !IsValid(ent) then

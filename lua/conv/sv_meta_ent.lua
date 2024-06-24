@@ -1,10 +1,8 @@
-// More entity methods
-
 local ENT = FindMetaTable("Entity")
 
 
-    -- Call a method for this ent next tick
-function ENT:CallNextTick( methodname, ... )
+-- Call a method for this ent next tick
+function ENT:AddonName_CallNextTick( methodname, ... )
 
     local function func( me, ... )
         if IsValid(me) then
@@ -18,8 +16,8 @@ function ENT:CallNextTick( methodname, ... )
 end
 
 
-    -- Temporarily set a variable on an entity
-function ENT:TempVar( name, value, duration )
+-- Temporarily set a variable on an entity
+function ENT:AddonName_TempVar( name, value, duration )
 
     self[name.."ValBefore"] = self[name.."ValBefore"] or self[name]
     self[name] = value
@@ -38,8 +36,8 @@ function ENT:TempVar( name, value, duration )
 end
 
 
-    -- Temporarily sets variables created by ENT:NetworkVar()
-function ENT:TempNetVar( funcName, value, duration )
+-- Temporarily sets variables created by ENT:NetworkVar()
+function ENT:AddonName_TempNetVar( funcName, value, duration )
 
     local setFuncName = "Set"..funcName
     local getFuncName = "Get"..funcName
@@ -60,36 +58,8 @@ function ENT:TempNetVar( funcName, value, duration )
 end
 
 
-
-    -- DEPRECATED
-    -- A regular timer, but just for entities
-    -- Will stop if the ent is not valid
-    -- Id does not have to include entindex, that is done automatically
-    -- Returns timer name
-function ENT:ConvTimer( id, delay, func, reps )
-
-    local TimerName = id..self:EntIndex()
-
-
-    timer.Create(TimerName, delay, reps or 1, function()
-
-        if !IsValid(self) then
-            timer.Remove(TimerName)
-            return
-        end
-
-        func()
-
-    end)
-
-
-    return TimerName
-
-end
-
-
-    -- Timer simple for entities with a built-in valid check
-function ENT:Conv_STimer( delay, func, ... )
+-- Timer simple for entities with a built-in valid check
+function ENT:AddonName_TimerSimple( delay, func, ... )
     local tbl = table.Pack(...)
     timer.Simple(delay, function()
         if IsValid(self) then
@@ -99,8 +69,8 @@ function ENT:Conv_STimer( delay, func, ... )
 end
 
 
-    -- Check if an entity has the supplied flags
-function ENT:Conv_HasFlags( flags )
+-- Check if an entity has the supplied flags
+function ENT:AddonName_HasFlags( flags )
     if !IsValid(self) then return false end
     return bit.band(self:GetFlags(), flags)==flags
 end
