@@ -1,1 +1,1 @@
-My GLua library for Gmod.
+Reusable code made by me.
