@@ -35,7 +35,7 @@ end
 -- Strip the players weapons, and gives only essential tools
 concommand.Add("conv_strip", function(ply, cmd, args)
     if !ply:IsSuperAdmin() then return end
-    net.Start("ConvStrip")
+    net.Start("CONV_StripAndTools")
     net.SendToServer()
 end)
 
@@ -43,12 +43,12 @@ end)
 -- Give ammo to all weapons for a player, needs admin
 concommand.Add("conv_giveammo", function(ply, cmd, args)
     if !ply:IsSuperAdmin() then return end
-    net.Start("ConvGiveAmmo")
+    net.Start("CONV_GiveAmmo")
     net.SendToServer()
 end)
 
 concommand.Add("conv_rmwep", function(ply, cmd, args)
-    net.Start("ConvRmWep")
+    net.Start("CONV_RmWep")
     net.SendToServer()
 end)
 
@@ -111,9 +111,9 @@ end
 function conv.ScrHCenter()
 	return scrHeight / 2
 end
-
+ 
 -- Used to create on screen messages/text similar to "game_text". entity https://developer.valvesoftware.com/wiki/Game_text
-function conv.addScreenMSG(id, text, font, x, y, tColor, xAlign, yAlign, OWidth, OColor, del, fadeIn, fadeOut, dur)	
+function conv.addScreenMSG(id, text, font, x, y, tColor, xAlign, yAlign, OWidth, OColor, del, fadeIn, fadeOut, dur)		
 	if ( id && ( !text || text == "" ) ) then CONVScrnMSGTab[ id ] = nil return end
 
 	CONVScrnMSGTab[ id ] = {
@@ -125,7 +125,7 @@ function conv.addScreenMSG(id, text, font, x, y, tColor, xAlign, yAlign, OWidth,
 		['XAlign'] 		= xAlign || TEXT_ALIGN_CENTER,
 		['YAlign'] 		= yAlign || TEXT_ALIGN_CENTER,
 		['OWidth'] 		= OWidth || 0,
-		['OColor'] 		= OColor || Color( 255, 255, 255, 255 ),
+		['OColor'] 		= OColor || Color( 0, 0, 0, 255 ),
 		['Delay'] 		= del || 0,
 		['FadeIn'] 		= fadeIn || 0,
 		['FadeOut'] 	= fadeOut || 0,

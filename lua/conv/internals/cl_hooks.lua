@@ -1,16 +1,16 @@
 // INTERNAL, DO NOT USE
 
 CONVScrnMSGTab = {}
-
+ 
 local function CONVScrnMSG()
 	if !table.IsEmpty( CONVScrnMSGTab ) then
-
+ 
 		for id, data in pairs( CONVScrnMSGTab ) do
 
 			local text = data['Text']
 			local font = data['Font']
-			local x = data['X'] * conv.ScrWScale()
-			local y = data['Y'] * conv.ScrHScale()
+			local x = data['X']
+			local y = data['Y']
 			local tColor = data['Color']
 			local xAlign = data['XAlign']
 			local yAlign = data['YAlign']
@@ -37,7 +37,7 @@ local function CONVScrnMSG()
 				if alpha <= 0 then CONVScrnMSGTab[ id ] = nil end
 
 			end
-			
+			 
 			local fTColor = Color( tColor.r, tColor.g, tColor.b, alpha )
 			local fOColor = Color( OColor.r, OColor.g, OColor.b, alpha )
 
@@ -46,7 +46,6 @@ local function CONVScrnMSG()
 		end
 
 	end
-
 end
 
 hook.Add("HUDPaint", "CONV", function()

@@ -132,7 +132,7 @@ function conv.callOnClient( ply, ent, functionName, ... )
 	if !isstring(functionName) || !... then return end
 
 	local data = {...}
-
+    
     data = conv.tableToString( data )
     ent = IsValid(ent) && tostring( ent:EntIndex() ) || ent || ""
     
@@ -192,4 +192,43 @@ function ENT:CONV_CreateOutputFunction(entOutput, func, delay, repetitions)
 	end)
 
 	self:Fire( "AddOutput", entOutput .. " CONV_LUA_RUN_ENT:RunPassedCode:hook.Run( '" .. hookID .. "' ):" .. delay .. ":" .. repetitions .. "" )
+end
+
+--[[
+==================================================================================================
+					UI
+==================================================================================================
+--]]
+
+local scrWidth = 1920
+local scrHeight = 1080
+
+-- Used to get the width of the player's screen.
+function conv.ScrW(ply)
+    return ply.CONV_SCRNW
+end
+
+-- Used to get the height of the player's screen.
+function conv.ScrH(ply)
+    return ply.CONV_SCRNH
+end
+
+-- Used to properly scale position and width of an UI elemet to different screen resolutions.
+function conv.ScrWScale(ply)
+	return conv.ScrW(ply) / scrWidth
+end
+
+-- Used to properly scale position and height of an UI elemet to different screen resolutions.
+function conv.ScrHScale(ply)
+	return conv.ScrH(ply) / scrHeight
+end
+
+-- Returns the central point of the horizontal axis.
+function conv.ScrWCenter()
+	return scrWidth / 2
+end
+
+-- Returns the central point of the vertical axis.
+function conv.ScrHCenter()
+	return scrHeight / 2
 end

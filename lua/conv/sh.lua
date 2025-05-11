@@ -680,12 +680,41 @@ end
 ==================================================================================================
 --]]
 
+-- Turns the table with keys ['1'], ['2'], ['3'] into a table with keys [1], [2], [3]
+function conv.tablePairsToIPairs( tbl )
+    if tbl['1'] then
+
+        for k, v in SortedPairs(tbl) do
+
+            if istable(v) && v['1'] then
+
+                for k2, v2 in SortedPairs(v) do
+
+                    v[k2] = nil
+                    v[tonumber( k2 )] = v2
+
+                end
+
+            end
+
+            tbl[k] = nil
+            tbl[tonumber( k )] = v
+
+         end
+
+         return tbl
+
+     end
+
+     return tbl
+end
+
 -- Turns the provided table into a string, respecting all variable types
 function conv.tableToString( tbl )
 	local str = "{"
 
 	for k, v in pairs(tbl) do
-
+        
 		if isstring(v) then
 
 			str = str .. string.format( "[%q] = %q,", k, v )
@@ -732,20 +761,12 @@ function conv.tableToString( tbl )
 end
 
 -- Turns the provided string into a table, recreating all variables
-function conv.stringToTable( str, toPairs )
-	local func = CompileString( "return " .. str, "StringToTable", false )
+function conv.stringToTable( str )
+    local func = CompileString( "return " .. str, "StringToTable", false )
     local tbl = func()
-    local tblPairs = {}
-
-    if tbl['1'] || toPairs then
-
-        for _, v in SortedPairs(tbl) do
-            table.insert( tblPairs, v )
-        end	
-
-        tbl = tblPairs
-
-    end
+    
+    tbl = conv.tablePairsToIPairs( tbl )
 
     return tbl
 end
+
