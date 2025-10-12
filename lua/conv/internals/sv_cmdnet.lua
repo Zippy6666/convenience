@@ -6,7 +6,7 @@ util.AddNetworkString("CONV_RmWep")
 util.AddNetworkString("CONV_ScreenRes")
 
 net.Receive("CONV_StripAndTools", function(len, ply)
-    if !ply:IsSuperAdmin() then return end
+    if not ply:IsSuperAdmin() then return end
     ply:StripWeapons()
     ply:Give("weapon_physgun")
     ply:Give("gmod_camera")
@@ -15,7 +15,7 @@ net.Receive("CONV_StripAndTools", function(len, ply)
 end)
 
 net.Receive("CONV_GiveAmmo", function(len, ply)
-    if !ply:IsSuperAdmin() then return end
+    if not ply:IsSuperAdmin() then return end
     for ammoid, ammoname in pairs(game.GetAmmoTypes()) do
         ply:GiveAmmo(game.GetCurrentAmmoMax(ammoid), ammoname)
     end
@@ -24,7 +24,7 @@ end)
 net.Receive("CONV_RmWep", function(len, ply)
     local wep = ply:GetActiveWeapon()
     
-    if !IsValid(wep) then 
+    if not IsValid(wep) then 
         ply:PrintMessage(HUD_PRINTTALK, "No weapon to remove.")    
         return 
     end

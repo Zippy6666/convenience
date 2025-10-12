@@ -32,15 +32,15 @@ local color_no = Color( 0, 0, 0, 0 )
 --]]
 
 -- Creates a derma menu with a lot of cool features
-function conv.dermaMenu( w, h, animDelta, blur, tittle, font, tColor, bgColor, hColor, tickFunc, crossFunc, categories )
-    bgColor = bgColor || color_white
-    hColor = hColor || Color( color_gmod.r, color_gmod.g, color_gmod.b, 255 )
-    font = font || "DermaDefaultBold"
+function conv.dermaMenu( w, h, animDelta, blur, tittle, font, tColor, bgColor, hColor, tickFunc, crossFunc )
+    bgColor = bgColor or color_white
+    hColor = hColor or Color( color_gmod.r, color_gmod.g, color_gmod.b, 255 )
+    font = font or "DermaDefaultBold"
 	
     local panel = vgui.Create( "DFrame" )
     panel:ParentToHUD()
     panel:SetTitle( "" )
-    w, h = w || ( 500 * conv.ScrWScale() ), h || ( 500 * conv.ScrHScale() )
+    w, h = w or ( 500 * conv.ScrWScale() ), h or ( 500 * conv.ScrHScale() )
     panel:SetSize( w, h )
     panel:Center()
     panel:SetVisible( true )
@@ -63,14 +63,15 @@ function conv.dermaMenu( w, h, animDelta, blur, tittle, font, tColor, bgColor, h
         draw.RoundedBoxEx( 10, 0, 0, w, h, bgColor, true, true, true, true )
         draw.RoundedBoxEx( 8, 0, 0, w, hThiccUp, hColor, true, true, false, false )	
 
-		conv.dermaTextScroll( self, w, 20, 5, isfunction(tittle) && tittle() || tittle, font, tColor, sColor )
-
+		--conv.dermaTextScroll( self, w, 20, 5, isfunction(tittle) and tittle() or tittle, font, tColor, sColor )
+        draw.CONV_DermaSimpleTextScroll( self, isfunction(tittle) and tittle() or tittle, font, w, 20, tColor, nil, nil, 5, 30, 1, true )
+        
     end
 
 -----------------------------------------------------------ANIMATIONS
 
     panel.OldThink = panel.Think
-    animDelta = animDelta || 0
+    animDelta = animDelta or 0
     local aStart, aDur = CurTime(), animDelta
 
     panel.Think = function(self)
@@ -85,8 +86,8 @@ function conv.dermaMenu( w, h, animDelta, blur, tittle, font, tColor, bgColor, h
     end
 -----------------------------------------------------------BUTTONS
 
-    tickFunc = tickFunc || function( self ) panel:Close() end
-    crossFunc = crossFunc || function( self ) panel:Close() end
+    tickFunc = tickFunc or function( self ) panel:Close() end
+    crossFunc = crossFunc or function( self ) panel:Close() end
     
     local buttonW, buttonH = 20 * conv.ScrWScale(), 20
 
@@ -114,10 +115,12 @@ function conv.dermaTextScroll( self, w, h, buffere, text, font, tColor, sColor )
         x = buffere + math.Remap( math.Clamp( mx, 0, w ), 0, w, 0, -diff )
     end
 
-    draw.SimpleText( text, font, x + 1, y + 1, sColor || color_shadow )
-    draw.SimpleText( text, font, x, y, tColor || color_white )
+    draw.SimpleText( text, font, x + 1, y + 1, sColor or color_shadow )
+    draw.SimpleText( text, font, x, y, tColor or color_white )
 
     render.SetScissorRect( 0, 0, 0, 0, false )
+
+    return tW, tH
 end
 
 function conv.dermaScrollBar(panel, sBarColor, sBarGripColor)
@@ -144,15 +147,17 @@ function conv.dermaPropertySheet(panel, font, tColor, sColor)
     panel.Paint = function(self, w, h)
     end
 
+    local tColor = tColor or color_white
+
     function panel:AddSheet( label, panel, material, NoStretchX, NoStretchY, Tooltip )
 
-        if ( !IsValid( panel ) ) then
+        if ( not IsValid( panel ) ) then
             ErrorNoHalt( "DPropertySheet:AddSheet tried to add invalid panel!" )
             debug.Trace()
             return
         end
 
-        font = font || "DermaDefaultBold"
+        font = font or "DermaDefaultBold"
         local Sheet = {}
 
         Sheet.Name = label
@@ -164,8 +169,10 @@ function conv.dermaPropertySheet(panel, font, tColor, sColor)
         local colW = Color( tColor.r * 2, tColor.g * 2, tColor.b * 2, 55 )
         Sheet.Tab.Paint = function(self, w, h)     
             
-            conv.dermaTextScroll( self, w, h, 5, label, font, tColor || color_white, sColor || color_black )
-            if self:IsActive() then conv.dermaTextScroll( self, w, h, 5, label, font, colW, colW ) end
+            
+            if self:IsActive() then draw.CONV_DermaSimpleTextScroll( self, label, font, w + 2, h + 2, colW, nil, nil, 5, 30, 1, true ) end
+
+            draw.CONV_DermaSimpleTextScroll( self, label, font, w, h, tColor, nil, nil, 5, 30, 1, true )
  
         end
 
@@ -186,7 +193,7 @@ function conv.dermaPropertySheet(panel, font, tColor, sColor)
 
         table.insert( self.Items, Sheet )
 
-        if ( !self:GetActiveTab() ) then
+        if ( not self:GetActiveTab() ) then
             self:SetActiveTab( Sheet.Tab )
             Sheet.Panel:SetVisible( true )
         end
@@ -201,13 +208,13 @@ function conv.dermaPropertySheet(panel, font, tColor, sColor)
 end
 
 function conv.dermaButton(self, w, h, x, y, text, font, tColor, bColor, funcClick)    
-    tColor = tColor || color_white
-    bColor = bColor || color_gmod
-    r = r || 8
+    local tColor = tColor or color_white
+    local bColor = bColor or color_gmod
+    local r = r or 8
     local animDone
 
     local panel = vgui.Create( "DButton", self )
-	panel:SetPos( x || 0, y || 0 )	
+	panel:SetPos( x or 0, y or 0 )	
 	panel:SetSize( w, h ) 
 	panel:SetText( "" )
     local clickReset = CurTime()
@@ -232,13 +239,13 @@ function conv.dermaButton(self, w, h, x, y, text, font, tColor, bColor, funcClic
 
     panel.Paint = function(self, w, h) 
         
-        local colHover = clickReset > CurTime() && colB || colW
+        local colHover = clickReset > CurTime() and colB or colW
       
         --draw.RoundedBoxEx( r, 0, 0, w, h, col, cornTab[1], cornTab[2], cornTab[3], cornTab[4] )   
         
-        conv.dermaTextScroll( self, w, h, 5, text, font, tColor )
+        if hover then draw.CONV_DermaSimpleTextScroll( self, text, font, w + 1, h + 1, colHover, nil, nil, 5, 30, 1, true ) end
 
-        if hover then conv.dermaTextScroll( self, w, h, 5, text, font, colHover, colHover ) end  
+        draw.CONV_DermaSimpleTextScroll( self, text, font, w, h, tColor, nil, nil, 5, 30, 1, true )
 
     end
 	

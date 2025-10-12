@@ -28,7 +28,7 @@ local function CONVScrnMSG()
 
 			if curTime < startTime + fadeIn then
 
-				alpha = fadeIn > 0 && math.Clamp( ( curTime - startTime ) / fadeIn, 0, 1 ) * 255 || 255
+				alpha = fadeIn > 0 and math.Clamp( ( curTime - startTime ) / fadeIn, 0, 1 ) * 255 or 255
 
 			elseif curTime >= startTime + fadeIn + dur then
 

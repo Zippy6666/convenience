@@ -4,7 +4,7 @@ hook.Add("InitPostEntity", "CONV", function()
     -- Store spawn menu NPCs
     conv._SpawnMenuNPCs = list.Get("NPC")
 
-    if ZBaseInstalled && istable(conv._SpawnMenuNPCs) && istable(ZBaseNPCs) then
+    if ZBaseInstalled and istable(conv._SpawnMenuNPCs) and istable(ZBaseNPCs) then
         table.Merge(conv._SpawnMenuNPCs, table.Copy(ZBaseNPCs))
     end
 

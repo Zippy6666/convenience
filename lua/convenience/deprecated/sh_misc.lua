@@ -15,7 +15,7 @@ local MaxAmmoCvar = GetConVar("gmod_maxammo")
 -- Insert an entity into a table, which is later removed once it is no longer valid
 function table.InsertEntity( tbl, ent )
 
-    if !IsValid(ent) then return end -- Must be ent
+    if not IsValid(ent) then return end -- Must be ent
 
     table.insert(tbl, ent)
 
@@ -42,7 +42,7 @@ function debug.ConvTraceFrom(level)
 	while true do
 
 		local info = debug.getinfo( level, "Sln" )
-		if ( !info ) then break end
+		if ( not info ) then break end
 
 		if ( info.what ) == "C" then
 			MsgN( string.format( "\t%i: C function\t\"%s\"", level, info.name ) )

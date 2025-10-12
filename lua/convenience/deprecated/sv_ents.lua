@@ -22,7 +22,7 @@ function ents.CreateSpawnMenuNPC( SpawnMenuClass, pos, wep )
 
 
     -- No such NPC
-    if !SpawnMenuTable then
+    if not SpawnMenuTable then
         ErrorNoHaltWithStack("No such NPC found: '", SpawnMenuClass, "'\n")
         return
     end
@@ -43,7 +43,7 @@ function ents.CreateSpawnMenuNPC( SpawnMenuClass, pos, wep )
 
 
     -- No such NPC
-    if !IsValid(NPC) then
+    if not IsValid(NPC) then
         ErrorNoHaltWithStack("No such NPC found: '", SpawnMenuTable.Class, "'\n")
         return
     end
@@ -56,7 +56,7 @@ function ents.CreateSpawnMenuNPC( SpawnMenuClass, pos, wep )
 
 
     -- Default weapons if none if provided
-    wep = wep or (SpawnMenuTable.Weapons && table.Random(SpawnMenuTable.Weapons))
+    wep = wep or (SpawnMenuTable.Weapons and table.Random(SpawnMenuTable.Weapons))
     if isstring(wep) then
         NPC:Give( wep )
     end
@@ -95,7 +95,7 @@ end
 function ents.GetInfo( cls, func )
 
     local ent = ents.Create(cls)
-    if !IsValid(ent) then
+    if not IsValid(ent) then
         ErrorNoHaltWithStack("No such ENT found: '", cls, "'\n")
         return
     end

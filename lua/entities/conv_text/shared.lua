@@ -25,7 +25,7 @@ function ENT:resetRemoveTimer(fDuration)
         Set or reset remove timer 
     ]]--
 
-    if !isnumber(fDuration) then
+    if not isnumber(fDuration) then
         error("No duration set for text!")
     end
 

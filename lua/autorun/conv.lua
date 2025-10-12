@@ -1,5 +1,5 @@
 --[[=========================== CONV MESSAGE START ===========================]]--
--- MissingConvMsg2 = CLIENT && function()
+-- MissingConvMsg2 = CLIENT and function()
 
 --     Derma_Query(
 --         "This server does not have Zippy's Library installed, addons will function incorrectly!",
@@ -27,7 +27,7 @@
 -- end)
 --[[============================ CONV MESSAGE END ============================]]--
 
-if !conv then
+if not conv then
     conv = conv or {}
 
 
@@ -42,15 +42,15 @@ if !conv then
         include("conv/sv.lua")
         include("conv/sh.lua")
 
-        CONV_LUA_RUN_ENT = CONV_LUA_RUN_ENT || nil
+        CONV_LUA_RUN_ENT = CONV_LUA_RUN_ENT or nil
     end
 
     if CLIENT then
         include("conv/cl.lua")
         include("conv/sh.lua")
 
-        CONVScrnMSGTab = CONVScrnMSGTab || {}
-        CONVHUDElementsTab = CONVHUDElementsTab || {}
+        CONVScrnMSGTab = CONVScrnMSGTab or {}
+        CONVHUDElementsTab = CONVHUDElementsTab or {}
         CONV_HUDCurTime = 0
     end
 

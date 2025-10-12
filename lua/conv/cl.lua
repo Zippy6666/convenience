@@ -10,10 +10,10 @@ local cl_drawhud = GetConVar( "cl_drawhud" )
 
 -- Function used by CallOnClient to translate sent data --
 function CONV_INTERNAL_COCTranslate( ent, funcN, data )  
-
+	
 	data = conv.stringToTable( data )	
 	
-	if IsValid(ent) || ent == game.GetWorld() then
+	if IsValid(ent) or ent == game.GetWorld() then
 			
 		ent[ funcN ]( ent, unpack( data ) )
 	
@@ -38,7 +38,7 @@ end
 
 -- Strip the players weapons, and gives only essential tools
 concommand.Add("conv_strip", function(ply, cmd, args)
-    if !ply:IsSuperAdmin() then return end
+    if not ply:IsSuperAdmin() then return end
     net.Start("CONV_StripAndTools")
     net.SendToServer()
 end)
@@ -46,7 +46,7 @@ end)
 
 -- Give ammo to all weapons for a player, needs admin
 concommand.Add("conv_giveammo", function(ply, cmd, args)
-    if !ply:IsSuperAdmin() then return end
+    if not ply:IsSuperAdmin() then return end
     net.Start("CONV_GiveAmmo")
     net.SendToServer()
 end)
@@ -66,7 +66,7 @@ concommand.Add("conv_checkweapons", function(ply, cmd, args)
     for _, wep in ipairs(weps) do
 
         weapon_slotmap["SLOT "..wep:GetSlot()] = weapon_slotmap["SLOT "..wep:GetSlot()] or {}
-        table.insert(weapon_slotmap["SLOT "..wep:GetSlot()], wep.PrintName && language.GetPhrase(wep.PrintName) or wep:GetClass())
+        table.insert(weapon_slotmap["SLOT "..wep:GetSlot()], wep.PrintName and language.GetPhrase(wep.PrintName) or wep:GetClass())
 
     end
 
@@ -75,12 +75,12 @@ end)
  
 -- Show information about the player's frames, frame times, ping, etc. conv_telemetry <1/0> <x> <y>
 concommand.Add( "conv_telemetry", function(ply, cmd, args)  
-	local enable = tonumber(args[1]) > 0
-	
+	local enable = args[1] and tonumber(args[1]) > 0
+
 	conv.addHUDElement("conv_telemetry", enable, function() 
 		local ply = LocalPlayer()
 		local w, h = 200, 100
-		local x, y = args && args[2] || conv.ScrWCenter() - ( w / 2 ), args && args[3] || conv.ScrHCenter() - 300
+		local x, y = args and args[2] or conv.ScrWCenter() - ( w / 2 ), args and args[3] or conv.ScrHCenter() - 300
 		draw.RoundedBox( 8, x, y, w, h, color_hl2hud_box )
 
 		local x1, y1 = x + 97, y + 15
@@ -124,6 +124,10 @@ end)
 --]]
 
 -- A convenient way to add toolmenu options
+-- 'tab' <string>: The tab to add the option to
+-- 'cat' <string>: The category to add the option to
+-- 'name' <string>: The name of the option
+-- 'func' <function>: The function to call when the option is selected
 function conv.addToolMenu(tab, cat, name, func)
     conv.toolMenuFuncs = conv.toolMenuFuncs or {}
     conv.toolMenuFuncs[tab.."_"..cat.."_"..name] = {tab=tab, cat=cat, name=name, func=func}
@@ -159,34 +163,34 @@ end
  
 -- Used to create hud elements on the go
 function conv.addHUDElement(id, enable, func)		
-	if ( id && enable == nil && !isfunction(func) ) then CONVHUDElementsTab[ id ] = nil return end
+	if ( id and enable == nil and not isfunction(func) ) then CONVHUDElementsTab[ id ] = nil return end
 	
 	CONVHUDElementsTab[id] = { 
-		['Enable']			= !enable && false || enable,
+		['Enable']			= not enable and false or enable,
 		['Function'] 		= func,
 	}
 end
  
 -- Used to create on screen messages/text similar to "game_text". entity https://developer.valvesoftware.com/wiki/Game_text
 function conv.addScreenMSG(id, text, font, x, y, tColor, xAlign, yAlign, OWidth, OColor, del, fadeIn, fadeOut, dur)		
-	if ( id && ( !text ) ) then CONVScrnMSGTab[ id ] = nil return end
+	if ( id and ( not text ) ) then CONVScrnMSGTab[ id ] = nil return end
 	
-	text = text || ""
-	font = font || "DermaDefault"
-	x = x || 0
-	y = y || 0
-	tColor = tColor || Color( 255, 255, 255, 255 )
-	xAlign = xAlign || TEXT_ALIGN_CENTER
-	yAlign = yAlign || TEXT_ALIGN_CENTER
-	OWidth = OWidth || 0
-	OColor = OColor || Color( 0, 0, 0, 255 )
-	del = del || 0
-	fadeIn = fadeIn || 0
-	fadeOut = fadeOut || 0
-	dur = dur || 0
+	text = text or ""
+	font = font or "DermaDefault"
+	x = x or 0
+	y = y or 0
+	tColor = tColor or Color( 255, 255, 255, 255 )
+	xAlign = xAlign or TEXT_ALIGN_CENTER
+	yAlign = yAlign or TEXT_ALIGN_CENTER
+	OWidth = OWidth or 0
+	OColor = OColor or Color( 0, 0, 0, 255 )
+	del = del or 0
+	fadeIn = fadeIn or 0
+	fadeOut = fadeOut or 0
+	dur = dur or 0
 
 	local function pp(tbl, k, s, add, ret)
-		return add && ( tbl[k] && tbl[k][s] && tbl[k][s] + add || add ) || ( tbl[k] && tbl[k][s] && tbl[k][s] || ret )
+		return add and ( tbl[k] and tbl[k][s] and tbl[k][s] + add or add ) or ( tbl[k] and tbl[k][s] and tbl[k][s] or ret )
 	end
 	
 	CONVScrnMSGTab[id] = { 
@@ -208,23 +212,30 @@ function conv.addScreenMSG(id, text, font, x, y, tColor, xAlign, yAlign, OWidth,
 end
 
 -- Used to play UI sounds
-function conv.emitUISound(snd, pitch, vol, channel, sfs, dsp, filter)		
+-- 'snd' <string>: The sound to play
+-- 'pitch' <number>: The pitch of the sound
+-- 'vol' <number>: The volume of the sound
+-- 'channel' <number>: The channel to play the sound on
+-- 'sfs' <number>: The sound filter scale
+-- 'dsp' <number>: The DSP level
+-- 'filter' <table>: The sound filter
+function conv.emitUISound(snd, pitch, vol, channel, sfs, dsp, filter)
 
 	local ply = LocalPlayer()
-	vol = vol || 1
-	pitch = pitch || 100
-	channel = channel || CHAN_AUTO
-	sfs = sfs || 0
-	dsp = dsp || 0
+	vol = vol or 1
+	pitch = pitch or 100
+	channel = channel or CHAN_AUTO
+	sfs = sfs or 0
+	dsp = dsp or 0
 
 
-	ply.m_tCONVClientSounds = ply.m_tCONVClientSounds || {}
+	ply.m_tCONVClientSounds = ply.m_tCONVClientSounds or {}
 
 
 	local function stopSND(snd)
 
 		for k, v in ipairs ( ply.m_tCONVClientSounds ) do
-			if snd && v == snd then
+			if snd and v == snd then
 				ply:StopSound( snd ) 	
 				table.remove( ply.m_tCONVClientSounds, k ) 		
 			else
@@ -241,11 +252,11 @@ function conv.emitUISound(snd, pitch, vol, channel, sfs, dsp, filter)
 		ply:EmitSound( snd, 0, pitch, vol, channel, sfs, dsp, filter )
 		table.insert( ply.m_tCONVClientSounds, snd )	
 
-	elseif snd && pitch == true then
+	elseif snd and pitch == true then
 
 		stopSND(snd)		
 
-	elseif !snd && ply.m_tCONVClientSounds && #ply.m_tCONVClientSounds > 0 then	
+	elseif not snd and ply.m_tCONVClientSounds and #ply.m_tCONVClientSounds > 0 then	
 
 		stopSND()
 
@@ -254,21 +265,29 @@ function conv.emitUISound(snd, pitch, vol, channel, sfs, dsp, filter)
 end
 
 -- Used to display text on an entity, useful for debugging or showing information
-function conv.displayOnEntity( name, ent, tab, dur, x, y, xAlign, yAlign )   
+-- 'name' <string>: The name of the display
+-- 'ent' <Entity>: The entity to display the text on
+-- 'tab' <table>: The table containing the text to display
+-- 'dur' <number>: The duration to display the text
+-- 'x' <number>: The x position
+-- 'y' <number>: The y position
+-- 'xAlign' <number>: The x alignment
+-- 'yAlign' <number>: The y alignment
+function conv.displayOnEntity( name, ent, tab, dur, x, y, xAlign, yAlign )
 
-	if !ent then return end
+	if not ent then return end
 
-	local name = "CONV_DisplayOnEntity" .. name .. ent:EntIndex() || "CONV_DisplayOnEntity" .. ent:EntIndex()
+	local name = "CONV_DisplayOnEntity" .. name .. ent:EntIndex() or "CONV_DisplayOnEntity" .. ent:EntIndex()
 
-	if !tab then ent:CONV_RemoveHook( "HUDPaint", name ) return end
+	if not tab then ent:CONV_RemoveHook( "HUDPaint", name ) return end
 
 	local ply = LocalPlayer()
 	local font = "ChatFont"
-	local x = x || 0
-	local y = y || 0
-	local dur = dur && dur < 0.1 && 0.1 || dur
-	local xAlign = xAlign || TEXT_ALIGN_CENTER
-	local yAlign = yAlign || TEXT_ALIGN_TOP
+	local x = x or 0
+	local y = y or 0
+	local dur = dur and dur < 0.1 and 0.1 or dur
+	local xAlign = xAlign or TEXT_ALIGN_CENTER
+	local yAlign = yAlign or TEXT_ALIGN_TOP
 
 	ent:CONV_AddHook( "HUDPaint", function()
 
@@ -282,7 +301,7 @@ function conv.displayOnEntity( name, ent, tab, dur, x, y, xAlign, yAlign )
 
 			v = tostring(v)
 
-			if !isnumber(k) then v = k .. " = " .. v end
+			if not isnumber(k) then v = k .. " = " .. v end
 
 			draw.SimpleText( v, font, sPos.x + x, sPos.y + ( i * 20 ) + y, color_white, xAlign, yAlign )
 		end
@@ -303,7 +322,7 @@ end
 -- 'condRemove' - A return function that controls if give icon should remove itself 
 function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, lifeTime, iconTab, bgPaint, condRemove)
 
-	if !iconTab then return end
+	if not iconTab then return end
 
 	-- Notification panel
 	local panel = vgui.Create( "DNotify" )
@@ -325,15 +344,15 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 	panel:AddItem( panelBG )
 
 	local baseX, baseY = panel:GetPos()
-	local spacing = spacing || 0
+	local spacing = spacing or 0
 
 	function panelBG:Paint(w, h)
 		-- Check if we should remove ourselves
-		if isfunction(condRemove) && condRemove( self ) then self:Remove() return end
-		if !conv.isHUDPainted() then return end
+		if isfunction(condRemove) and condRemove( self ) then self:Remove() return end
+		if not conv.isHUDPainted() then return end
 
 		-- Calculate our position using our position in the global table
-		local idx = table.Flip( iconTab )[self] || 1
+		local idx = table.Flip( iconTab )[self] or 1
 		local add = idx - 1
 
 		if reverseOrder then
@@ -350,7 +369,7 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 
 				local prev = iconTab[i]
 
-				if IsValid(prev) && prev:GetParent() && prev:GetParent():IsValid() then
+				if IsValid(prev) and prev:GetParent() and prev:GetParent():IsValid() then
 					offsetX = offsetX - ( prev:GetParent():GetWide() + spacing )
 				else
 					offsetX = offsetX - ( w + spacing )
@@ -365,7 +384,7 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 
 				local prev = iconTab[i]
 
-				if IsValid(prev) && prev:GetParent() && prev:GetParent():IsValid() then
+				if IsValid(prev) and prev:GetParent() and prev:GetParent():IsValid() then
 					offsetX = offsetX + ( prev:GetParent():GetWide() + spacing )
 				else
 					offsetX = offsetX + ( w + spacing )
@@ -380,7 +399,7 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 
 				local prev = iconTab[i]
 
-				if IsValid(prev) && prev:GetParent() && prev:GetParent():IsValid() then
+				if IsValid(prev) and prev:GetParent() and prev:GetParent():IsValid() then
 					offsetY = offsetY - ( prev:GetParent():GetTall() + spacing )
 				else
 					offsetY = offsetY - ( h + spacing )
@@ -395,7 +414,7 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 
 				local prev = iconTab[i]
 
-				if IsValid(prev) && prev:GetParent() && prev:GetParent():IsValid() then
+				if IsValid(prev) and prev:GetParent() and prev:GetParent():IsValid() then
 					offsetY = offsetY + ( prev:GetParent():GetTall() + spacing )
 				else
 					offsetY = offsetY + ( h + spacing )
@@ -414,9 +433,9 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 				if i == myIdx then continue end
 
 				local prev = iconTab[i]
-				local sign = ( i < myIdx ) && -1 || 1
+				local sign = ( i < myIdx ) and -1 or 1
 
-				if IsValid(prev) && prev:GetParent() && IsValid(prev:GetParent()) then
+				if IsValid(prev) and prev:GetParent() and IsValid(prev:GetParent()) then
 					offsetY = offsetY + sign * ( prev:GetParent():GetTall() + spacing ) / 2
 				else
 					offsetY = offsetY + sign * ( h + spacing ) / 2
@@ -435,9 +454,9 @@ function conv.createHUDStatusIcon(x, y, w, h, direction, reverseOrder, spacing, 
 				if i == myIdx then continue end
 
 				local prev = iconTab[i]
-				local sign = ( i < myIdx ) && -1 || 1
+				local sign = ( i < myIdx ) and -1 or 1
 
-				if IsValid(prev) && prev:GetParent() && IsValid(prev:GetParent()) then
+				if IsValid(prev) and prev:GetParent() and IsValid(prev:GetParent()) then
 					offsetX = offsetX + sign * ( prev:GetParent():GetWide() + spacing ) / 2
 				else
 					offsetX = offsetX + sign * ( w + spacing ) / 2
@@ -482,7 +501,7 @@ function conv.createHUDElement(x, y, w, h, bgPaint, condRemove)
 		if isfunction(condRemove) and condRemove(self) then self:Remove() return end
 
 		-- Check if HUD is being drawn
-		if !conv.isHUDPainted() then return end
+		if not conv.isHUDPainted() then return end
 
 		-- Call custom paint function
 		bgPaint( self, w, h )
@@ -494,7 +513,7 @@ end
 
 -- Returns true if 'HUDPaint' is being called or false if it's being blocked by (for an example) SWEP Camera
 function conv.isHUDPainted()
-	return CONV_HUDCurTime >= CurTime() && cl_drawhud:GetBool()
+	return CONV_HUDCurTime >= CurTime() and cl_drawhud:GetBool()
 end
 
 --[[
@@ -504,9 +523,15 @@ end
 --]]
 
 -- Setup world fog, set no values to reset
+-- 'fogStart' <number>: The start distance of the fog
+-- 'fogEnd' <number>: The end distance of the fog
+-- 'fogMaxDensity' <number>: The maximum density of the fog
+-- 'fogColor' <Color>: The color of the fog
+-- 'fogMode' <number>: The mode of the fog
+-- 'fogZ' <number>: The Z distance of the fog
 function conv.setupWorldFog(fogStart, fogEnd, fogMaxDensity, fogColor, fogMode, fogZ)
 
-	if !fogStart && !fogEnd && !fogMaxDensity && !fogColor && !fogMode && !fogZ then 
+	if not fogStart and not fogEnd and not fogMaxDensity and not fogColor and not fogMode and not fogZ then 
 		fogMode = 0 
 
 		conv.callNextTick( function() 
@@ -518,19 +543,25 @@ function conv.setupWorldFog(fogStart, fogEnd, fogMaxDensity, fogColor, fogMode, 
 	local c = { render.GetFogColor() }
 
 	CONV_FOG_WORLD = {}
-	CONV_FOG_WORLD.FogStart			= fogStart || s
-	CONV_FOG_WORLD.FogEnd 			= fogEnd || e
-	CONV_FOG_WORLD.FogMaxDensity 	= fogMaxDensity || 0.5
-	CONV_FOG_WORLD.FogColor 		= fogColor || c
-	CONV_FOG_WORLD.FogMode			= fogMode || 1
-	CONV_FOG_WORLD.FogZ				= fogZ || z
+	CONV_FOG_WORLD.FogStart			= fogStart or s
+	CONV_FOG_WORLD.FogEnd 			= fogEnd or e
+	CONV_FOG_WORLD.FogMaxDensity 	= fogMaxDensity or 0.5
+	CONV_FOG_WORLD.FogColor 		= fogColor or c
+	CONV_FOG_WORLD.FogMode			= fogMode or 1
+	CONV_FOG_WORLD.FogZ				= fogZ or z
 
 end
 
 -- Setup skybox fog, set no values to reset
+-- 'fogStart' <number>: The start distance of the fog
+-- 'fogEnd' <number>: The end distance of the fog
+-- 'fogMaxDensity' <number>: The maximum density of the fog
+-- 'fogColor' <Color>: The color of the fog
+-- 'fogMode' <number>: The mode of the fog
+-- 'fogZ' <number>: The Z distance of the fog
 function conv.setupSkyboxFog(fogStart, fogEnd, fogMaxDensity, fogColor, fogMode, fogZ)
 
-	if !fogStart && !fogEnd && !fogMaxDensity && !fogColor && !fogMode && !fogZ then 
+	if not fogStart and not fogEnd and not fogMaxDensity and not fogColor and not fogMode and not fogZ then 
 		fogMode = 0 
 
 		conv.callNextTick( function() 
@@ -542,12 +573,12 @@ function conv.setupSkyboxFog(fogStart, fogEnd, fogMaxDensity, fogColor, fogMode,
 	local c = { render.GetFogColor() }
 
 	CONV_FOG_SKYBOX = {}
-	CONV_FOG_SKYBOX.FogStart		= fogStart || 0
-	CONV_FOG_SKYBOX.FogEnd 			= fogEnd || 10000
-	CONV_FOG_SKYBOX.FogMaxDensity 	= fogMaxDensity || 0.5
-	CONV_FOG_SKYBOX.FogColor 		= fogColor || c
-	CONV_FOG_SKYBOX.FogMode			= fogMode || 1
-	CONV_FOG_SKYBOX.FogZ			= fogZ || z
+	CONV_FOG_SKYBOX.FogStart		= fogStart or 0
+	CONV_FOG_SKYBOX.FogEnd 			= fogEnd or 10000
+	CONV_FOG_SKYBOX.FogMaxDensity 	= fogMaxDensity or 0.5
+	CONV_FOG_SKYBOX.FogColor 		= fogColor or c
+	CONV_FOG_SKYBOX.FogMode			= fogMode or 1
+	CONV_FOG_SKYBOX.FogZ			= fogZ or z
 
 end
 

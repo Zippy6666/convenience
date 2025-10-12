@@ -9,8 +9,8 @@ ENT.m_tabRenderFX ={
     -- Pulse effect, varies alpha based on sine wave
     -- 'speed' controls the frequency of the pulse
     pulse = function(t, baseCol, pos, speed, strength)
-        local speed = speed || 4
-        local strength = strength || 1
+        local speed = speed or 4
+        local strength = strength or 1
         local alpha = baseCol.a + math.sin(t * speed) * baseCol.a * strength
         return Color(baseCol.r, baseCol.g, baseCol.b, math.Clamp(alpha, 0, baseCol.a))
     end,
@@ -19,8 +19,8 @@ ENT.m_tabRenderFX ={
     -- 'delay' controls the blink duration
     -- 'speed' controls the blink frequency
     blinkfadein = function(t, baseCol, pos, delay, speed)
-        local delay = delay || 4
-        local speed = speed || 1
+        local delay = delay or 4
+        local speed = speed or 1
         local alpha = math.min(baseCol.a, ((t % (delay * 2)) * baseCol.a) * speed)
         return Color(baseCol.r, baseCol.g, baseCol.b, alpha)
     end,
@@ -29,20 +29,20 @@ ENT.m_tabRenderFX ={
     -- 'delay' controls the fade duration
     -- 'speed' controls the fade speed
     blinkfadeout = function(t, baseCol, pos, delay, speed)
-        local delay = delay || 4
-        local speed = speed || 1
+        local delay = delay or 4
+        local speed = speed or 1
         local alpha = math.max(0, baseCol.a - ((t % (delay * 2) * baseCol.a) * speed))
         return Color(baseCol.r, baseCol.g, baseCol.b, alpha)
     end,
 
-    -- Strobe effect, toggles alpha on && off
+    -- Strobe effect, toggles alpha on and off
     -- 'delay' controls the strobe duration
     -- 'speed' controls the strobe frequency
     strobe = function(t, baseCol, pos, delay, speed)
-        local delay = delay || 8
-        local speed = speed || 8
+        local delay = delay or 8
+        local speed = speed or 8
         local on = math.floor(t * speed) % delay == 0
-        return Color(baseCol.r, baseCol.g, baseCol.b, on && baseCol.a || 0)
+        return Color(baseCol.r, baseCol.g, baseCol.b, on and baseCol.a or 0)
     end,
 
     -- Flicker effect, varies alpha randomly
@@ -57,14 +57,14 @@ ENT.m_tabRenderFX ={
     -- 'colTab' is a table of colors to cycle through
     colorcycle = function(t, baseCol, pos, delay, speed, colTab)
         -- If the first argument is a table, use it as the color list
-        if #colTab == 1 && istable(colTab[1]) then
+        if #colTab == 1 and istable(colTab[1]) then
             colTab = colTab[1]
         end
         if #colTab == 0 then
             colTab = {baseCol, Color(255,255,255,baseCol.a)}
         end
-        delay = delay || 1
-        speed = speed || 1
+        delay = delay or 1
+        speed = speed or 1
         local total = #colTab   
         local cycleTime = delay * total / speed
         local cur = (t % cycleTime) / delay * speed
@@ -79,21 +79,21 @@ ENT.m_tabRenderFX ={
         return Color(r, g, b, a)
     end,
 
-    -- Blink effect, toggles alpha on && off
+    -- Blink effect, toggles alpha on and off
     -- 'speed' controls the blink frequency
     blink = function(t, baseCol, pos, speed)
-        local speed = speed || 2
+        local speed = speed or 2
         local on = math.floor(t * speed) % 2 == 0
-        return Color(baseCol.r, baseCol.g, baseCol.b, on && baseCol.a || 0)
+        return Color(baseCol.r, baseCol.g, baseCol.b, on and baseCol.a or 0)
     end,
 
     -- Fade in effect, smoothly increases alpha based on distance from player
     -- 'fadeDist' controls the distance at which the sprite is fully faded in
     fadein = function(t, baseCol, pos, fadeDist)
         local ply = LocalPlayer()
-        if !IsValid(ply) || !pos then return baseCol end
+        if not IsValid(ply) or not pos then return baseCol end
         local dist = ply:GetPos():Distance(pos)
-        local fadeDist = fadeDist || 256 -- distance at which sprite is fully faded in
+        local fadeDist = fadeDist or 256 -- distance at which sprite is fully faded in
         if dist > fadeDist then return Color(baseCol.r, baseCol.g, baseCol.b, 0) end
         local alpha = math.Clamp(baseCol.a * (1 - math.Clamp(dist / fadeDist, 0, 1)), 0, baseCol.a)
         return Color(baseCol.r, baseCol.g, baseCol.b, alpha)
@@ -103,9 +103,9 @@ ENT.m_tabRenderFX ={
     -- 'fadeDist' controls the distance at which the sprite is fully faded out
     fadeout = function(t, baseCol, pos, fadeDist)
         local ply = LocalPlayer()
-        if !IsValid(ply) || !pos then return baseCol end
+        if not IsValid(ply) or not pos then return baseCol end
         local dist = ply:GetPos():Distance(pos)
-        local fadeDist = fadeDist || 256 -- distance at which sprite is fully faded out
+        local fadeDist = fadeDist or 256 -- distance at which sprite is fully faded out
         if dist > fadeDist then return Color(baseCol.r, baseCol.g, baseCol.b, 0) end
         local alpha = math.Clamp(baseCol.a * (1 - (dist / fadeDist)), 0, baseCol.a)
         return Color(baseCol.r, baseCol.g, baseCol.b, alpha)
@@ -137,9 +137,9 @@ end
 -- If a Material object is provided, it will be used directly
 -- If no material is provided, it defaults to "sprites/glow04"
 function ENT:SetSpriteModel(materialName, pngParameters)
-    local matPath = materialName || self.m_sModel
+    local matPath = materialName or self.m_sModel
     if isstring(matPath) then
-        self.m_sModel = Material(matPath, pngParameters || "")
+        self.m_sModel = Material(matPath, pngParameters or "")
     else
         self.m_sModel = matPath
     end
@@ -159,7 +159,7 @@ end
 -- If no value is provided, it defaults to 3 (glow)
 -- https://developer.valvesoftware.com/wiki/Render_modes
 function ENT:SetSpriteRenderMode(mode)
-    self.m_fRenderMode = mode || 3
+    self.m_fRenderMode = mode or 3
 end
 
 
@@ -176,7 +176,7 @@ end
 -- If the name is not found, it defaults to "none"
 function ENT:SetSpriteRenderFX(name, ...)
     self.m_tabRenderFXValues = {...}
-    self.m_funcRenderFX = self.m_tabRenderFX[name] || self.m_tabRenderFX.none   
+    self.m_funcRenderFX = self.m_tabRenderFX[name] or self.m_tabRenderFX.none   
 end
 
 
@@ -195,8 +195,8 @@ end
 -- Accepts width and height parameters
 -- If no parameters are provided, defaults to 32x32
 function ENT:SetSpriteSize(width, height)
-    self.m_flWidth = width || 32
-    self.m_flHeight = height || 32
+    self.m_flWidth = width or 32
+    self.m_flHeight = height or 32
     self:SetSpriteGlowProxy()
 end
 
@@ -212,7 +212,7 @@ end
 -- Set the sprite glow proxy size
 -- Accepts a value for the glow proxy size
 function ENT:SetSpriteGlowProxy(val)
-    local val = val || math.max(self.m_flWidth, self.m_flHeight) * 0.5
+    local val = val or math.max(self.m_flWidth, self.m_flHeight) * 0.5
     self.m_fGlowProxy = val 
 end
 
@@ -231,11 +231,11 @@ end
 -- The offset vector is applied to the position of the sprite
 -- Offset should be based on the sprite entity, not parent attachment
 function ENT:SetSpriteParentAttachment(ent, att, offset)
-    if !IsValid(ent) then return end
+    if not IsValid(ent) then return end
     local att = ent:LookupAttachment(att)
-    if !att then return end
+    if not att then return end
 
-    local offset = offset || Vector(0, 0, 0)
+    local offset = offset or Vector(0, 0, 0)
 
     self.m_vecOffset = offset
     self.m_fParent = ent
@@ -247,9 +247,9 @@ end
 -- Accepts an entity and an optional offset vector
 -- The offset vector is applied to the position of the sprite
 function ENT:SetSpriteParent(ent, offset)
-    if !IsValid(ent) then return end
+    if not IsValid(ent) then return end
 
-    local offset = offset || Vector(0, 0, 0)
+    local offset = offset or Vector(0, 0, 0)
 
     self.m_vecOffset = offset
     self.m_fParent = ent
@@ -305,7 +305,7 @@ function ENT:Think()
 
         end
 
-    elseif !IsValid(parent) && self.m_fParent then
+    elseif not IsValid(parent) and self.m_fParent then
 
         self:Remove()
 
@@ -327,18 +327,18 @@ function ENT:DrawTranslucent()
     local w, h = self:GetSpriteSize()
 
     -- Use util.PixelVisible to determine visibility
-    if !self.m_pPixelVisHandle then
+    if not self.m_pPixelVisHandle then
         self.m_pPixelVisHandle = util.GetPixelVisibleHandle()
     end
 
     local eyePos = EyePos()
-    local visFrac = util.PixelVisible(pos, self:GetSpriteGlowProxy() * self:GetModelScale(), self.m_pPixelVisHandle) || 0
+    local visFrac = util.PixelVisible(pos, self:GetSpriteGlowProxy() * self:GetModelScale(), self.m_pPixelVisHandle) or 0
 
     if visFrac <= 0 then return end
 
     col = Color(col.r, col.g, col.b, col.a * visFrac)
 
-    self:GetSpriteModel():SetInt( "$spriterendermode", self:GetSpriteRenderMode() || self:GetSpriteModel():GetInt( "$spriterendermode" ) || 3 )
+    self:GetSpriteModel():SetInt( "$spriterendermode", self:GetSpriteRenderMode() or self:GetSpriteModel():GetInt( "$spriterendermode" ) or 3 )
 
     render.SetMaterial(self:GetSpriteModel())
     render.DrawSprite(

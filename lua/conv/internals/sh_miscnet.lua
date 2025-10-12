@@ -17,11 +17,11 @@ if CLIENT then
 		local funcN = net.ReadString()
 		local data = net.ReadString()
 		
-		ent = _G[ ent ] || ent != "" && Entity( tonumber(ent) ) 
+		ent = _G[ ent ] or ent != "" and Entity( tonumber(ent) ) 
 		
-		funcN = _G[ funcN ] || funcN
+		funcN = _G[ funcN ] or funcN
 		
-		if isfunction( funcN ) || ent && ent[ funcN ] then
+		if isfunction( funcN ) or ent and ent[ funcN ] then
 			
 			CONV_INTERNAL_COCTranslate( ent, funcN, data )
 

@@ -43,7 +43,7 @@ function ENT:TempNetVar( funcName, value, duration )
     local setFuncName = "Set"..funcName
     local getFuncName = "Get"..funcName
 
-    if !self[setFuncName.."NetValBefore"] then
+    if not self[setFuncName.."NetValBefore"] then
         self[setFuncName](name, value)
     end
 
@@ -72,7 +72,7 @@ function ENT:ConvTimer( id, delay, func, reps )
 
     timer.Create(TimerName, delay, reps or 1, function()
 
-        if !IsValid(self) then
+        if not IsValid(self) then
             timer.Remove(TimerName)
             return
         end
@@ -100,7 +100,7 @@ end
 
 -- Check if an entity has the supplied flags
 function ENT:Conv_HasFlags( flags )
-    if !IsValid(self) then return false end
+    if not IsValid(self) then return false end
     return bit.band(self:GetFlags(), flags)==flags
 end
 
@@ -120,6 +120,6 @@ function PLY:PosInView( pos )
     })
 
 
-    return angleDifference <= self:GetFOV() && !tr.Hit
+    return angleDifference <= self:GetFOV() and not tr.Hit
 
 end
