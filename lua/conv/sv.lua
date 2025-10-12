@@ -1,10 +1,24 @@
 local ENT = FindMetaTable("Entity")
 local PLAYER = FindMetaTable("Player")
 
+--[[
+==================================================================================================
+                    PLAYER UTILITIES
+==================================================================================================
+--]]
+
+function PLAYER:CONV_SetPlayerClass(class)
+    self:SetSaveValue("m_nControlClass", class or 1)
+end
+
+function PLAYER:CONV_GetPlayerClass()
+    return self:GetInternalVariable("m_nControlClass")
+end
+
 
 --[[
 ==================================================================================================
-                    npc SPAWNING
+                    NPC SPAWNING
 ==================================================================================================
 --]]
 
@@ -333,16 +347,6 @@ end
 --]]
 
 function conv.dmgInfoGetDamager(dmginfo)
-                    PLAYER UTILITIES
---]]
-
-function PLAYER:CONV_SetPlayerClass(class)
-    self:SetSaveValue("m_nControlClass", class or 1)
-end
-
-function PLAYER:CONV_GetPlayerClass()
-    return self:GetInternalVariable("m_nControlClass")
-end
     local att = IsValid(dmginfo:GetAttacker()) && dmginfo:GetAttacker()
     local inf = IsValid(dmginfo:GetInflictor()) && dmginfo:GetInflictor()
     local wep = IsValid(dmginfo:GetWeapon()) && dmginfo:GetWeapon()
@@ -359,10 +363,6 @@ function conv.damageBasic(damage, dmgtype, pos, attacker)
     dmginfo:SetDamagePosition(pos)
     return dmginfo
 end
-
---[[
-                    COMMANDS
---]]
 
 -- Dumps the total size of all workshop addons in GB to the console
 concommand.Add("conv_dump_sv_workshop_gb", function( ply )
