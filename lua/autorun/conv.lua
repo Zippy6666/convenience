@@ -1,5 +1,5 @@
 --[[=========================== CONV MESSAGE START ===========================]]--
--- MissingConvMsg2 = CLIENT and function()
+-- MissingConvMsg2 = CLIENT && function()
 
 --     Derma_Query(
 --         "This server does not have Zippy's Library installed, addons will function incorrectly!",
@@ -15,7 +15,7 @@
 --         "Close"
 --     )
 
--- end or nil
+-- end || nil
 
 -- hook.Add("PlayerInitialSpawn", "MissingConvMsg2", function( ply )
 
