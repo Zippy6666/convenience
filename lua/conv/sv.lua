@@ -134,24 +134,24 @@ function conv.entCanSpawn(cls, pos, filter, mustHaveGround)
     -- Ground check
     if mustHaveGround then
         local downAFairBit = Vector(0, 0, -15)
-        for i, vec in ipairs({Vector(maxs.x, maxs.y, 5), 
-                            Vector(-maxs.x, maxs.y, 5), 
-                            Vector(maxs.x, -maxs.y, 5), 
+        for i, vec in ipairs({Vector(maxs.x, maxs.y, 5),
+                            Vector(-maxs.x, maxs.y, 5),
+                            Vector(maxs.x, -maxs.y, 5),
                             Vector(-maxs.x, -maxs.y, 5)}) do
             local trstart = pos+vec
             local trend = trstart + downAFairBit
-            
+
             local tr2 = util.TraceLine({
                 start=trstart,
                 endpos=trend,
                 filter=filter
             })
-            
+
             debugoverlay.Line(trstart, trend, 1, color_green)
-            
+
             if !tr2.Hit then
                 return false
-            end 
+            end
         end
     end
 
@@ -203,14 +203,13 @@ function conv.callOnClient( ply, ent, functionName, ... )
     end
 end
 
-
 --[[
 ==================================================================================================
                     LUA RUN
 ==================================================================================================
 --]]
 
--- Creates the lua_run entity to be used with related functions --
+-- Creates the lua_run entity to be used with related functions -- 
 function conv.createLuaRun()
 	CONV_LUA_RUN_ENT = ents.Create( "lua_run" )
 	if IsValid(CONV_LUA_RUN_ENT) then
@@ -219,27 +218,27 @@ function conv.createLuaRun()
 	end
 end
 
--- Creates a hook that runs whenever the set entity fires the specified output. --
+-- Creates a hook that runs whenever the set entity fires the specified output. -- 
 function ENT:CONV_CreateOutputHook(entOutput, eventName, delay, repetitions)
-	if !IsValid(CONV_LUA_RUN_ENT) then conv.createLuaRun() end
-
-	delay = delay || 0
-	repetitions = repetitions || -1
-
+	if not IsValid(CONV_LUA_RUN_ENT) then conv.createLuaRun() end
+	
+	delay = delay or 0
+	repetitions = repetitions or -1
+	
 	self:Fire( "AddOutput", entOutput .. " CONV_LUA_RUN_ENT:RunPassedCode:hook.Run( '" .. eventName .. "' ):" .. delay .. ":" .. repetitions .. "" )
 end
 
--- Creates a function that runs whenever the set entity fires the specified output. --
+-- Creates a function that runs whenever the set entity fires the specified output. -- 
 function ENT:CONV_CreateOutputFunction(entOutput, func, delay, repetitions)
-	if !self || !IsValid(self) then return end
-	if !IsValid(CONV_LUA_RUN_ENT) then conv.createLuaRun() end
-
-	delay = delay || 0
-	repetitions = repetitions || -1
+	if not self or not IsValid(self) then return end
+	if not IsValid(CONV_LUA_RUN_ENT) then conv.createLuaRun() end
+	
+	delay = delay or 0
+	repetitions = repetitions or -1
 
 	local hookID = entOutput .. self:GetClass() .. self:EntIndex()
 
-	hook.Add(hookID, self, function()
+	hook.Add(hookID, self, function() 
 
 		local activator, caller = ACTIVATOR, CALLER
 		func(self, activator, caller)
